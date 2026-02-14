@@ -268,35 +268,54 @@
 
         // --- FINALIZAR TURNO ---
         window.finalizarTurno = function() {
-            if(!confirm("Deseja fechar o turno e salvar o relatório?")) return;
+    if(!confirm("Deseja fechar o turno e salvar o relatório definitivo?")) return;
 
-            try {
-                const producaoAtual = parseInt(document.getElementById('valProducao').innerText) || 0;
-                const metaAtual = dadosTurnoAtual.meta || 1;
-                const porcentagem = Math.floor((producaoAtual / metaAtual) * 100);
+    // 1. Coleta os dados para o relatório
+    const prodAtual = document.getElementById('valProducao').innerText;
+    const metaAtual = dadosTurnoAtual.meta || 0;
+    const porcentagem = metaAtual > 0 ? Math.floor((parseInt(prodAtual) / metaAtual) * 100) : 0;
 
-                const relatorioFinal = {
-                    data: new Date().toLocaleDateString(),
-                    ...dadosTurnoAtual,
-                    hora_fim: new Date().toLocaleTimeString(),
-                    producao_total: producaoAtual,
-                    porcentagem_atingida: porcentagem,
-                    tempo_trabalhado: document.getElementById('valTempoTrabalhado').innerText,
-                    tempo_parado: document.getElementById('valTempoParado').innerText,
-                    timestamp: Date.now()
-                };
+    const relatorioFinal = {
+        data: new Date().toLocaleDateString(),
+        ...dadosTurnoAtual,
+        hora_fim: new Date().toLocaleTimeString(),
+        producao_total: prodAtual,
+        porcentagem_atingida: porcentagem,
+        tempo_trabalhado: document.getElementById('valTempoTrabalhado').innerText,
+        tempo_parado: document.getElementById('valTempoParado').innerText,
+        timestamp: Date.now()
+    };
 
-                push(ref(db, 'relatorios_consolidados'), relatorioFinal)
-                .then(() => {
-                    alert("✅ Turno encerrado e salvo!");
-                    location.reload();
-                })
-                .catch((erro) => {
-                    alert("❌ Erro ao salvar: " + erro.message);
-                    if(confirm("Forçar saída?")) location.reload();
-                });
-            } catch (e) { alert("Erro: " + e.message); }
+    // 2. Tenta salvar no Histórico
+    push(ref(db, 'relatorios_consolidados'), relatorioFinal)
+    .then(() => {
+        // 3. APÓS SALVAR, LIMPA TUDO PARA O PRÓXIMO
+        console.log("Relatório salvo. Limpando dados do turno atual...");
+        
+        // Manda o comando de RESET para o ESP32
+        set(ref(db, 'maquina_01/comando'), "CMD_RESET");
+        
+        // Apaga as informações do turno anterior para o site voltar ao Login
+        set(ref(db, 'maquina_01/info_turno'), null);
+        set(ref(db, 'maquina_01/status'), "AGUARDANDO");
+        set(ref(db, 'maquina_01/producao'), 0);
+        set(ref(db, 'maquina_01/qtd_paradas'), 0);
+        set(ref(db, 'maquina_01/historico_paradas'), null);
+
+        alert("✅ Turno Finalizado com Sucesso!");
+        
+        // Pequeno atraso para o Firebase processar e então recarrega
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    })
+    .catch((error) => {
+        alert("❌ Erro ao salvar relatório: " + error.message);
+        if(confirm("Deseja forçar a limpeza da tela mesmo sem salvar?")) {
+            location.reload();
         }
+    });
+}
 
         window.salvarMotivo = function(motivo) {
             if(idUltimaParadaSemMotivo) {
