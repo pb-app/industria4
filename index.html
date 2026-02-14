@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MES Supervisor - Gestão de Operadores</title>
+    <title>MES Supervisor - Turno 3</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; color: #333; }
         
         /* --- NAVEGAÇÃO --- */
         .navbar { background: #1e3c72; padding: 0 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: flex; align-items: center; height: 60px; position: sticky; top: 0; z-index: 1000; color: white; }
-        .nav-brand { font-weight: bold; font-size: 1.2rem; margin-right: 20px; display: flex; align-items: center; gap: 10px; }
-        .nav-item { padding: 18px 12px; cursor: pointer; color: rgba(255,255,255,0.7); font-weight: 500; border-bottom: 3px solid transparent; transition: 0.3s; font-size: 0.85rem; }
+        .nav-brand { font-weight: bold; font-size: 1.2rem; margin-right: 30px; display: flex; align-items: center; gap: 10px; }
+        .nav-item { padding: 18px 15px; cursor: pointer; color: rgba(255,255,255,0.7); font-weight: 500; border-bottom: 3px solid transparent; transition: 0.3s; font-size: 0.9rem; }
         .nav-item:hover { color: white; background: rgba(255,255,255,0.1); }
         .nav-item.active { color: white; border-bottom-color: #4facfe; }
 
@@ -19,22 +19,40 @@
         .view-section { display: none; animation: fadeIn 0.3s; }
         .view-section.active { display: block; }
 
-        /* --- CARDS E COMPONENTES --- */
-        .card-box { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        /* --- CARDS DA VISÃO GERAL (MULTI-MÁQUINA) --- */
         .grid-supervisao { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px; font-weight: 600; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .card-maq-resumo { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 5px solid #bdc3c7; }
+        .card-maq-resumo.rodando { border-top-color: #27ae60; }
+        .card-maq-resumo.parada { border-top-color: #e74c3c; }
+        .header-maq { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
         
-        .btn { border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center; }
-        .btn-primary { background: #27ae60; color: white; }
-        .btn-blue { background: #3498db; color: white; }
-        .btn-danger { background: #c0392b; color: white; }
+        /* --- TELA DE SETUP (LOGIN) --- */
+        #view-setup { justify-content: center; align-items: center; display: none; min-height: 80vh; }
+        #view-setup.active { display: flex; }
+        .login-box { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .grid-login { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        label { display: block; font-size: 0.8rem; color: #666; margin-bottom: 4px; font-weight: 600; }
+
+        /* --- DASHBOARD PRODUÇÃO --- */
+        .header-turno { background: white; padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 10px; }
+        .card-monitor { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .value-large { font-size: 2.5rem; font-weight: 800; display: block; margin: 5px 0; }
+        
+        /* BARRA META */
+        .progress-bg { background: #eee; height: 8px; border-radius: 4px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { background: #3498db; height: 100%; width: 0%; transition: 0.5s; }
 
         /* TABELAS */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; padding: 12px; background: #f8f9fa; color: #666; font-size: 0.85rem; border-bottom: 2px solid #eee; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
+        .table-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; background: #f8f9fa; font-size: 0.85rem; color: #666; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+
+        .btn { border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-primary { background: #27ae60; color: white; }
+        .btn-danger { background: #c0392b; color: white; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -42,87 +60,98 @@
 <body>
 
     <nav class="navbar">
-        <div class="nav-brand"><span class="material-icons">precision_manufacturing</span> MES T3</div>
-        <div class="nav-item active" onclick="mudarAba('geral')" id="tab-geral">GERAL</div>
+        <div class="nav-brand"><span class="material-icons">analytics</span> SUPERVISÃO T3</div>
+        <div class="nav-item active" onclick="mudarAba('geral')" id="tab-geral">VISÃO GERAL</div>
         <div class="nav-item" onclick="mudarAba('setup')" id="tab-setup">ABRIR PRODUÇÃO</div>
-        <div class="nav-item" onclick="mudarAba('cadastro')" id="tab-cadastro">CADASTRO OP</div>
+        <div class="nav-item" onclick="mudarAba('monitoramento')" id="tab-monitoramento">MONITORAR MAQ</div>
         <div class="nav-item" onclick="mudarAba('historico')" id="tab-historico">HISTÓRICO</div>
     </nav>
 
     <div class="container">
         
         <div id="view-geral" class="view-section active">
-            <div class="grid-supervisao" id="gridMaquinas"></div>
+            <h2 style="margin-top:0;">Status das Máquinas em Tempo Real</h2>
+            <div class="grid-supervisao" id="gridMaquinas">
+                </div>
         </div>
 
-        <div id="view-cadastro" class="view-section">
-            <div class="card-box" style="max-width: 500px; margin: 0 auto;">
-                <h3><span class="material-icons">person_add</span> Registrar Novo Operador</h3>
-                <div class="input-group">
-                    <label>Nome Completo</label>
-                    <input type="text" id="cadNome" placeholder="Ex: Ageu Felipe Salto">
+        <div id="view-setup" class="view-section">
+            <div class="login-box">
+                <h3 style="margin-top:0; text-align:center;">Configurar Nova Produção</h3>
+                <div class="grid-login">
+                    <div><label>Máquina</label>
+                        <select id="selMaquina"><option value="maquina_01">Máquina 01</option><option value="maquina_02">Máquina 02</option></select>
+                    </div>
+                    <div><label>Turno</label>
+                        <select id="selTurno"><option>Turno 3</option><option>Turno 1</option><option>Turno 2</option></select>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label>Turno Padrão</label>
-                    <select id="cadTurno">
-                        <option value="Turno 3">Turno 3</option>
-                        <option value="Turno 1">Turno 1</option>
-                        <option value="Turno 2">Turno 2</option>
-                    </select>
+                <div class="grid-login">
+                    <div><label>Operador</label><input type="text" id="inpOp" placeholder="Nome"></div>
+                    <div><label>Ref. Peça</label><input type="text" id="inpRef" placeholder="SKU"></div>
                 </div>
-                <button class="btn btn-blue" style="width: 100%;" onclick="cadastrarOperador()">SALVAR OPERADOR</button>
+                <label>Meta do Turno</label>
+                <input type="number" id="inpMeta" placeholder="Ex: 1000" style="margin-bottom:15px;">
+                <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="iniciarProducao()">INICIAR EQUIPAMENTO</button>
+            </div>
+        </div>
+
+        <div id="view-monitoramento" class="view-section">
+            <div id="monitorVazio" style="text-align:center; padding:40px; color:#999;">
+                <span class="material-icons" style="font-size:4rem;">precision_manufacturing</span>
+                <p>Nenhuma máquina sendo monitorada detalhadamente no momento.</p>
+                <button class="btn btn-primary" style="margin: 0 auto;" onclick="mudarAba('setup')">Abrir uma Produção</button>
             </div>
 
-            <div class="card-box">
-                <h3>Operadores Cadastrados</h3>
-                <table id="tabOperadores">
-                    <thead><tr><th>Data Cadastro</th><th>Nome</th><th>Turno</th><th>Ação</th></tr></thead>
+            <div id="monitorAtivo" style="display:none;">
+                <div class="header-turno">
+                    <div><small>Máquina Ativa</small><strong id="detMaquina" style="display:block; font-size:1.2rem;">--</strong></div>
+                    <div><small>Operador</small><strong id="detOp" style="display:block;">--</strong></div>
+                    <button class="btn btn-danger" onclick="finalizarTurno()"><span class="material-icons">power_settings_new</span> Finalizar</button>
+                </div>
+                
+                <div class="grid-supervisao">
+                    <div class="card-monitor">
+                        <h3>Produção / Meta</h3>
+                        <span class="value-large" id="detProducao">0</span>
+                        <div class="progress-bg"><div class="progress-fill" id="detBarra"></div></div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                            <span id="detPct">0%</span> <span>Meta: <strong id="detMeta">0</strong></span>
+                        </div>
+                    </div>
+                    <div class="card-monitor">
+                        <h3>Eficiência Tempo</h3>
+                        <div style="display:flex; gap:20px; align-items:center;">
+                            <div><small>Trabalhado</small><strong id="detTempoOk" style="display:block; color:#27ae60; font-size:1.5rem;">0m</strong></div>
+                            <div><small>Parado</small><strong id="detTempoParado" style="display:block; color:#e74c3c; font-size:1.5rem;">0m</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-box" style="margin-top:20px;">
+                    <h3>Últimas Paradas</h3>
+                    <table id="tabParadasDet"><thead><tr><th>Hora</th><th>Tempo</th><th>Motivo</th></tr></thead><tbody></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-historico" class="view-section">
+            <div class="table-box">
+                <h3 style="margin-top:0;">Relatórios Consolidados de Todas as Máquinas</h3>
+                <table id="tabHistorico">
+                    <thead><tr><th>Data/Fim</th><th>Máquina</th><th>Operador</th><th>Produção</th><th>Meta %</th><th>Paradas</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
         </div>
-
-        <div id="view-setup" class="view-section">
-            <div class="card-box" style="max-width: 450px; margin: 0 auto;">
-                <h3 style="text-align:center;">Setup de Equipamento</h3>
-                
-                <label>Selecione o Turno</label>
-                <select id="selTurno" onchange="filtrarOperadoresPorTurno()" style="margin-bottom:15px;">
-                    <option value="Turno 3">Turno 3</option>
-                    <option value="Turno 1">Turno 1</option>
-                    <option value="Turno 2">Turno 2</option>
-                </select>
-
-                <label>Operador Responsável</label>
-                <select id="selOperador" style="margin-bottom:15px;">
-                    <option value="">Aguardando turno...</option>
-                </select>
-
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div><label>Máquina</label>
-                        <select id="selMaquina"><option value="maquina_01">Maq 01</option><option value="maquina_02">Maq 02</option></select>
-                    </div>
-                    <div><label>Ref. Peça</label><input type="text" id="inpRef" placeholder="SKU"></div>
-                </div>
-                
-                <label style="margin-top:10px;">Meta do Turno</label>
-                <input type="number" id="inpMeta" placeholder="Quantidade">
-                
-                <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="iniciarProducao()">INICIAR PRODUÇÃO</button>
-            </div>
-        </div>
-
-        <div id="view-monitoramento" class="view-section">... (Dashboard Individual) ...</div>
-        <div id="view-historico" class="view-section">... (Tabela de Relatórios) ...</div>
-
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, update, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
+            apiKey: "AIzaSyB9Mh4F3simtiUU0oRMgTHQiWzQnPpVGTo", 
+            authDomain: "industria4-57d2d.firebaseapp.com",
             databaseURL: "https://industria4-57d2d-default-rtdb.firebaseio.com",
             projectId: "industria4-57d2d",
         };
@@ -130,99 +159,132 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let listaOperadoresGlobal = [];
+        let maqSendoMonitorada = "";
+        let infoTurnoCache = null;
 
         window.mudarAba = function(aba) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
             document.getElementById(`view-${aba}`).classList.add('active');
             document.getElementById(`tab-${aba}`).classList.add('active');
-            if(aba === 'setup') filtrarOperadoresPorTurno();
         }
 
-        // --- 1. CADASTRO DE OPERADORES ---
-        window.cadastrarOperador = function() {
-            const nome = document.getElementById('cadNome').value;
-            const turno = document.getElementById('cadTurno').value;
-            
-            if(!nome) return alert("Digite o nome!");
+        // --- 1. LOGICA VISÃO GERAL (TODAS AS MÁQUINAS) ---
+        onValue(ref(db), (snapshot) => {
+            const root = snapshot.val();
+            const grid = document.getElementById('gridMaquinas');
+            grid.innerHTML = "";
 
-            const novoOp = {
-                nome: nome,
-                turno: turno,
-                data: new Date().toLocaleDateString()
-            };
+            // Procuramos por chaves que começam com "maquina_"
+            Object.keys(root).forEach(key => {
+                if(key.startsWith('maquina_')) {
+                    const m = root[key];
+                    const info = m.info_turno || {};
+                    const statusClass = m.status === 'RODANDO' ? 'rodando' : (m.status === 'PARADA' ? 'parada' : '');
+                    const corStatus = m.status === 'RODANDO' ? '#27ae60' : '#e74c3c';
 
-            push(ref(db, 'configuracoes/operadores'), novoOp).then(() => {
-                document.getElementById('cadNome').value = "";
-                alert("Operador salvo!");
+                    grid.innerHTML += `
+                        <div class="card-maq-resumo ${statusClass}">
+                            <div class="header-maq">
+                                <strong>${key.toUpperCase().replace('_', ' ')}</strong>
+                                <span class="status-pill" style="background:${corStatus}; color:white">${m.status || 'OFFLINE'}</span>
+                            </div>
+                            <div style="font-size:0.9rem; color:#666;">Operador: <b>${info.operador || '--'}</b></div>
+                            <div style="font-size:1.4rem; font-weight:bold; margin:10px 0;">${m.producao || 0} pçs</div>
+                            <button class="btn" style="width:100%; border:1px solid #ddd; justify-content:center;" 
+                                onclick="monitorarEspecifica('${key}')">Ver Detalhes</button>
+                        </div>
+                    `;
+                }
+            });
+        });
+
+        window.monitorarEspecifica = function(idMaq) {
+            maqSendoMonitorada = idMaq;
+            document.getElementById('monitorVazio').style.display = 'none';
+            document.getElementById('monitorAtivo').style.display = 'block';
+            mudarAba('monitoramento');
+            vincularMonitoramento(idMaq);
+        }
+
+        // --- 2. LOGICA MONITORAMENTO DETALHADO ---
+        function vincularMonitoramento(idMaq) {
+            onValue(ref(db, idMaq), (snapshot) => {
+                if(maqSendoMonitorada !== idMaq) return;
+                const dados = snapshot.val();
+                if(!dados) return;
+
+                const info = dados.info_turno || {};
+                infoTurnoCache = info;
+
+                document.getElementById('detMaquina').innerText = idMaq.toUpperCase();
+                document.getElementById('detOp').innerText = info.operador || "--";
+                document.getElementById('detProducao').innerText = dados.producao || 0;
+                document.getElementById('detMeta').innerText = info.meta || 0;
+
+                if(info.meta) {
+                    const pct = Math.floor((dados.producao / info.meta) * 100);
+                    document.getElementById('detBarra').style.width = (pct > 100 ? 100 : pct) + "%";
+                    document.getElementById('detPct').innerText = pct + "%";
+                }
             });
         }
 
-        // Monitora lista de operadores para preencher a tabela e o select
-        onValue(ref(db, 'configuracoes/operadores'), (snapshot) => {
-            const dados = snapshot.val();
-            const tbody = document.querySelector("#tabOperadores tbody");
-            tbody.innerHTML = "";
-            listaOperadoresGlobal = [];
-
-            if (dados) {
-                Object.entries(dados).forEach(([id, op]) => {
-                    listaOperadoresGlobal.push(op);
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${op.data}</td>
-                            <td>${op.nome}</td>
-                            <td>${op.turno}</td>
-                            <td><button onclick="removerOp('${id}')" style="color:red; background:none; border:none; cursor:pointer;">Remover</button></td>
-                        </tr>
-                    `;
-                });
-            }
-            filtrarOperadoresPorTurno();
-        });
-
-        window.removerOp = function(id) {
-            if(confirm("Remover operador?")) remove(ref(db, `configuracoes/operadores/${id}`));
-        }
-
-        // --- 2. FILTRO INTELIGENTE NO SETUP ---
-        window.filtrarOperadoresPorTurno = function() {
-            const turnoSelecionado = document.getElementById('selTurno').value;
-            const selectOp = document.getElementById('selOperador');
-            selectOp.innerHTML = "";
-
-            const filtrados = listaOperadoresGlobal.filter(op => op.turno === turnoSelecionado);
-
-            if(filtrados.length === 0) {
-                selectOp.innerHTML = '<option value="">Nenhum operador cadastrado neste turno</option>';
-            } else {
-                filtrados.forEach(op => {
-                    selectOp.innerHTML += `<option value="${op.nome}">${op.nome}</option>`;
-                });
-            }
-        }
-
-        // --- 3. INICIAR PRODUÇÃO ---
+        // --- 3. INICIAR E FINALIZAR ---
         window.iniciarProducao = function() {
             const idMaq = document.getElementById('selMaquina').value;
-            const opNome = document.getElementById('selOperador').value;
-            
-            if(!opNome) return alert("Selecione um operador!");
-
             const dados = {
-                operador: opNome,
+                operador: document.getElementById('inpOp').value,
                 meta: parseInt(document.getElementById('inpMeta').value),
                 referencia: document.getElementById('inpRef').value,
                 turno: document.getElementById('selTurno').value,
                 hora_inicio: new Date().toLocaleTimeString()
             };
 
-            set(ref(db, idMaq + '/info_turno'), dados);
-            set(ref(db, idMaq + '/comando'), "CMD_RESET");
-            alert("Produção Iniciada!");
-            mudarAba('geral');
+            if(!dados.operador || !dados.meta) return alert("Preencha Operador e Meta!");
+
+            update(ref(db, idMaq), {
+                info_turno: dados,
+                comando: "CMD_RESET",
+                producao: 0,
+                status: "AGUARDANDO",
+                historico_paradas: null
+            }).then(() => {
+                alert("Máquina configurada!");
+                monitorarEspecifica(idMaq);
+            });
         }
+
+        window.finalizarTurno = function() {
+            if(!maqSendoMonitorada || !confirm("Finalizar turno desta máquina?")) return;
+
+            // Lógica de salvar no relatorios_consolidados (igual anterior)
+            // ... (A lógica de push e null que fizemos no passo anterior)
+            // Lembre-se de usar a variável `maqSendoMonitorada` no caminho do ref
+            set(ref(db, `${maqSendoMonitorada}/info_turno`), null);
+            set(ref(db, `${maqSendoMonitorada}/comando`), "CMD_RESET");
+            alert("Turno encerrado.");
+            location.reload();
+        }
+
+        // --- 4. HISTÓRICO ---
+        onValue(ref(db, 'relatorios_consolidados'), (snapshot) => {
+            const list = snapshot.val();
+            const body = document.querySelector("#tabHistorico tbody");
+            body.innerHTML = "";
+            if(list) {
+                Object.values(list).reverse().forEach(r => {
+                    body.innerHTML += `<tr>
+                        <td>${r.data}<br><small>${r.hora_fim}</small></td>
+                        <td>${r.maquina}</td>
+                        <td>${r.operador}</td>
+                        <td>${r.producao_total}</td>
+                        <td>${r.porcentagem_atingida}%</td>
+                        <td>${r.tempo_parado}</td>
+                    </tr>`;
+                });
+            }
+        });
 
     </script>
 </body>
