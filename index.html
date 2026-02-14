@@ -253,21 +253,38 @@
         window.finalizarTurno = function() {
             if(!confirm("Deseja fechar o turno e salvar o relatório?")) return;
 
-            const relatorioFinal = {
-                data: new Date().toLocaleDateString(),
-                ...dadosTurnoAtual,
-                hora_fim: new Date().toLocaleTimeString(),
-                producao_total: document.getElementById('valProducao').innerText,
-                tempo_trabalhado: document.getElementById('valTempoTrabalhado').innerText,
-                tempo_parado: document.getElementById('valTempoParado').innerText,
-                timestamp: Date.now() // Importante para ordenar depois
-            };
+            // 1. Prepara os dados (Coloquei dentro de um Try para pegar erros de digitação)
+            try {
+                const relatorioFinal = {
+                    data: new Date().toLocaleDateString(),
+                    ...dadosTurnoAtual, // Pega Operador, Turno, etc.
+                    hora_fim: new Date().toLocaleTimeString(),
+                    producao_total: document.getElementById('valProducao').innerText,
+                    tempo_trabalhado: document.getElementById('valTempoTrabalhado').innerText,
+                    tempo_parado: document.getElementById('valTempoParado').innerText,
+                    timestamp: Date.now()
+                };
 
-            push(ref(db, 'relatorios_consolidados'), relatorioFinal)
-            .then(() => {
-                alert("Turno encerrado e salvo no Histórico!");
-                location.reload();
-            });
+                // 2. Tenta salvar no Firebase
+                push(ref(db, 'relatorios_consolidados'), relatorioFinal)
+                .then(() => {
+                    alert("✅ Turno encerrado e salvo no Histórico!");
+                    location.reload(); // Atualiza a página (Volta pro Login)
+                })
+                .catch((error) => {
+                    // SE DER ERRO NO FIREBASE, ELE AVISA AQUI:
+                    alert("❌ Erro ao salvar no banco de dados: " + error.message);
+                    console.error(error);
+                    
+                    // Pergunta se quer sair mesmo assim (caso esteja sem internet)
+                    if(confirm("O relatório não pôde ser salvo (erro de conexão). Deseja sair mesmo assim?")) {
+                        location.reload();
+                    }
+                });
+
+            } catch (erroInterno) {
+                alert("❌ Erro ao gerar relatório: " + erroInterno.message);
+            }
         }
 
         window.salvarMotivo = function(motivo) {
