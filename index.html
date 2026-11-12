@@ -118,11 +118,9 @@
         // 3. Aplica a foto no fundo e já deixa o nome dele preparado (mas escondido)
         document.getElementById('foto-fundo').style.backgroundImage = `url('${famosoSorteado.arquivo}')`;
         document.getElementById('nome-famoso').innerText = famosoSorteado.nome;
-        // 2. O código escolhe uma foto aleatória dessa lista
-        const fotoSorteada = listaDeFamosos[Math.floor(Math.random() * listaDeFamosos.length)];
 
-        // 3. Aplica a foto escolhida no fundo do jogo
-        document.getElementById('foto-fundo').style.backgroundImage = `url('${fotoSorteada}')`;
+        // 4. Criar os quadrados
+        for (let i = 0; i < totalSquares; i++) {
 
         // 1. Criar os quadrados
         for (let i = 0; i < totalSquares; i++) {
