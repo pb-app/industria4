@@ -2,43 +2,49 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <!-- A TAG MÁGICA: Diz para o celular não diminuir a tela e ajustar ao tamanho do aparelho -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Quem é o Famoso?</title>
     <style>
         body {
-            background-color: #00ff00; /* Fundo verde para Chroma Key no OBS */
+            background-color: #00ff00; /* Fundo verde */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
+            overflow: hidden; /* Evita que a tela crie barra de rolagem */
         }
 
         .game-container {
             position: relative;
-            width: 500px;
-            height: 500px;
+            /* Alterado para responsivo: Ocupa 90% da largura do celular */
+            width: 90vw; 
+            max-width: 500px; /* Mantém o limite caso você abra no PC */
+            aspect-ratio: 1 / 1; /* Garante que a foto continue um quadrado perfeito */
             border: 5px solid #fff;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin-top: 50px; /* Espaço extra para o cronômetro caber em cima */
+            margin-top: 50px; 
         }
 
         /* O Cronômetro no topo da tela */
         .timer-display {
             position: absolute;
-            top: -70px;
+            top: -65px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 45px;
+            font-size: 32px; /* Tamanho da fonte ajustado para celular */
             font-weight: 900;
             color: #ffffff;
-            background-color: #ff004f; /* Rosa/Vermelho estilo TikTok */
-            padding: 5px 30px;
+            background-color: #ff004f; 
+            padding: 5px 25px;
             border-radius: 15px;
             border: 4px solid #fff;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             z-index: 20;
             transition: background-color 0.3s;
+            white-space: nowrap; /* Impede que o tempo quebre em duas linhas */
         }
 
         /* A foto do famoso no fundo */
@@ -77,26 +83,27 @@
         /* Mensagem de Vencedor */
         .winner-banner {
             position: absolute;
-            bottom: -80px;
+            bottom: -60px;
             width: 100%;
             text-align: center;
             background: #ffcc00;
-            padding: 15px;
-            font-size: 24px;
+            padding: 10px;
+            font-size: 20px;
             font-weight: bold;
             display: none;
             border-radius: 10px;
             z-index: 20;
+            box-sizing: border-box;
         }
 
         /* Estilo do nome do famoso que vai aparecer */
         .celebrity-name {
             position: absolute;
-            top: 20px;
+            top: 15px;
             width: 100%;
             text-align: center;
             color: #ffffff;
-            font-size: 40px;
+            font-size: 30px;
             font-weight: 900;
             text-shadow: 3px 3px 10px #000000;
             display: none;
@@ -150,24 +157,30 @@
         // 6. Variáveis do jogo e do tempo
         let currentIndex = 0;
         let tempoDecorrido = 0; 
+        let jogoAcabou = false; // Controle para evitar travar duas vezes
         
         // 7. Função que remove quadrados e conta o tempo a cada 1 segundo
         const revealInterval = setInterval(() => {
-            if (currentIndex < squaresArray.length) {
+            if (currentIndex < squaresArray.length && !jogoAcabou) {
                 squaresArray[currentIndex].classList.add('hidden');
                 currentIndex++;
                 
                 // Aumenta o tempo e atualiza na tela
                 tempoDecorrido++;
                 document.getElementById('tempo').innerText = tempoDecorrido + "s";
-            } else {
+            } else if (!jogoAcabou) {
+                // Acabou o tempo e as peças sumiram
                 clearInterval(revealInterval); 
                 document.getElementById('nome-famoso').style.display = 'block';
+                jogoAcabou = true;
             }
-        }, 1000); // 1000 milissegundos = 1 segundo
+        }, 1000); 
 
-        // 8. Função de vitória (Chamada pela barra de espaço ou chat)
+        // 8. Função de vitória
         function someoneWon(playerName) {
+            if (jogoAcabou) return; // Se já acabou, não faz nada
+            jogoAcabou = true;
+
             clearInterval(revealInterval); 
             squaresArray.forEach(sq => sq.classList.add('hidden')); 
             
@@ -175,7 +188,7 @@
             document.getElementById('winner').style.display = 'block';
             document.getElementById('nome-famoso').style.display = 'block'; 
 
-            // Muda a cor do cronômetro para verde florescente para destacar o tempo final!
+            // Muda a cor do cronômetro para verde florescente
             document.getElementById('tempo').style.backgroundColor = "#00ffcc";
             document.getElementById('tempo').style.color = "#000000";
         }
@@ -185,21 +198,26 @@
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-        // Truque para gravar vídeos: Aperta Espaço para revelar e travar o relógio!
+        // ATUALIZAÇÃO PARA CELULAR: Dá um toque na tela verde para travar o relógio!
+        document.addEventListener('click', () => {
+            someoneWon('Você?');
+        });
+
+        // Truque para gravar vídeos no PC (apertando a Barra de Espaço)
         document.addEventListener('keydown', (event) => {
             if (event.code === 'Space') {
                 someoneWon('Você?');
             }
         });
         
-        // Conexão com o servidor do Bot (Não interfere na gravação)
+        // Conexão com o servidor do Bot (Não interfere na gravação do celular)
         try {
             const socket = io();
             socket.on('temosVencedor', (dados) => {
                 someoneWon(dados.vencedor);
             });
         } catch (e) {
-            console.log("Modo offline para gravação de vídeos curtos.");
+            console.log("Modo offline para gravação.");
         }
     </script>
 </body>
