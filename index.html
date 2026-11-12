@@ -134,6 +134,9 @@
                 currentIndex++;
             } else {
                 clearInterval(revealInterval); // Para quando todos sumirem
+                
+                // NOVIDADE: Faz o nome aparecer sozinho quando as peças acabam!
+                document.getElementById('nome-famoso').style.display = 'block';
             }
         }, 500); // 1000 milissegundos = 1 segundo por quadrado
 
