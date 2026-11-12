@@ -70,6 +70,23 @@
             display: none;
             border-radius: 10px;
         }
+
+
+        /* Estilo do nome do famoso que vai aparecer */
+        .celebrity-name {
+            position: absolute;
+            top: 20px; /* Fica no topo da imagem */
+            width: 100%;
+            text-align: center;
+            color: #ffffff;
+            font-size: 40px;
+            font-weight: 900;
+            text-shadow: 3px 3px 10px #000000; /* Sombra preta para dar leitura fácil */
+            display: none; /* Começa invisível */
+            z-index: 10;
+        }
+
+        
     </style>
 </head>
 <body>
@@ -78,21 +95,29 @@
         <div class="celebrity-photo" id="foto-fundo"></div>
         <div class="grid-overlay" id="grid"></div>
         <div class="winner-banner" id="winner">Vencedor: <span id="winner-name"></span>!</div>
+        <!-- Esta é a linha nova: -->
+        <div class="celebrity-name" id="nome-famoso"></div>
     </div>
-
+    
     <script>
         const grid = document.getElementById('grid');
         const totalSquares = 100; // 10x10
         let squaresArray = [];
 
-        // 1. Lista com o nome exato das fotos que você colocou na pasta (com a extensão .jpg ou .png)
+        // 1. Lista com a foto e o nome exato do famoso
         const listaDeFamosos = [
-            'neymar.jpg', 
-            'messi.jpg', 
-            'anitta.jpg', 
-            'cr7.jpg'
+            { arquivo: 'neymar.jpg', nome: 'Neymar Jr.' },
+            { arquivo: 'messi.jpg', nome: 'Lionel Messi' },
+            { arquivo: 'anitta.jpg', nome: 'Anitta' },
+            { arquivo: 'cr7.jpg', nome: 'Cristiano Ronaldo' }
         ];
 
+        // 2. O código escolhe um famoso aleatório dessa lista
+        const famosoSorteado = listaDeFamosos[Math.floor(Math.random() * listaDeFamosos.length)];
+
+        // 3. Aplica a foto no fundo e já deixa o nome dele preparado (mas escondido)
+        document.getElementById('foto-fundo').style.backgroundImage = `url('${famosoSorteado.arquivo}')`;
+        document.getElementById('nome-famoso').innerText = famosoSorteado.nome;
         // 2. O código escolhe uma foto aleatória dessa lista
         const fotoSorteada = listaDeFamosos[Math.floor(Math.random() * listaDeFamosos.length)];
 
@@ -121,16 +146,18 @@
             }
         }, 1000); // 1000 milissegundos = 1 segundo por quadrado
 
-        // (Futuro) Função que o Bot vai chamar quando alguém acertar
+        // Função que é chamada quando alguém acerta (ou quando você aperta Espaço)
         function someoneWon(playerName) {
-            clearInterval(revealInterval); // Para o cronômetro
-            // Some com todos os quadrados restantes de uma vez
+            clearInterval(revealInterval); 
             squaresArray.forEach(sq => sq.classList.add('hidden')); 
             
-            // Mostra o nome do vencedor
             document.getElementById('winner-name').innerText = playerName;
             document.getElementById('winner').style.display = 'block';
+            
+            // Faz o nome do famoso aparecer lindão na tela!
+            document.getElementById('nome-famoso').style.display = 'block'; 
         }
+        
     </script> <!-- FECHAMOS O SCRIPT AQUI -->
 
     <!-- ADICIONAMOS O LINK DO SOCKET.IO AQUI NO HTML -->
