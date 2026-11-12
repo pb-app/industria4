@@ -132,6 +132,15 @@
         socket.on('temosVencedor', (dados) => {
             someoneWon(dados.vencedor);
         });
+
+        // Truque para gravar vídeos: Aperta Espaço para revelar!
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                someoneWon('Você?'); // O nome que vai aparecer na tela
+            }
+        });
+
+        
     </script>
 </body>
 </html>
