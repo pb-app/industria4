@@ -71,7 +71,6 @@
             border-radius: 10px;
         }
 
-
         /* Estilo do nome do famoso que vai aparecer */
         .celebrity-name {
             position: absolute;
@@ -85,8 +84,6 @@
             display: none; /* Começa invisível */
             z-index: 10;
         }
-
-        
     </style>
 </head>
 <body>
@@ -95,7 +92,6 @@
         <div class="celebrity-photo" id="foto-fundo"></div>
         <div class="grid-overlay" id="grid"></div>
         <div class="winner-banner" id="winner">Vencedor: <span id="winner-name"></span>!</div>
-        <!-- Esta é a linha nova: -->
         <div class="celebrity-name" id="nome-famoso"></div>
     </div>
     
@@ -121,19 +117,16 @@
 
         // 4. Criar os quadrados
         for (let i = 0; i < totalSquares; i++) {
-
-        // 1. Criar os quadrados
-        for (let i = 0; i < totalSquares; i++) {
             const square = document.createElement('div');
             square.classList.add('square');
             grid.appendChild(square);
             squaresArray.push(square);
         }
 
-        // 2. Embaralhar a ordem dos quadrados para eles sumirem de forma aleatória
+        // 5. Embaralhar a ordem dos quadrados para eles sumirem de forma aleatória
         squaresArray.sort(() => Math.random() - 0.5);
 
-        // 3. Função para remover um quadrado a cada 1 segundo
+        // 6. Função para remover um quadrado a cada 1 segundo
         let currentIndex = 0;
         const revealInterval = setInterval(() => {
             if (currentIndex < squaresArray.length) {
@@ -155,30 +148,28 @@
             // Faz o nome do famoso aparecer lindão na tela!
             document.getElementById('nome-famoso').style.display = 'block'; 
         }
-        
-    </script> <!-- FECHAMOS O SCRIPT AQUI -->
+    </script> 
 
-    <!-- ADICIONAMOS O LINK DO SOCKET.IO AQUI NO HTML -->
+    <!-- Link do Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
 
-    <!-- ABRIMOS UM NOVO SCRIPT SÓ PARA A CONEXÃO -->
     <script>
-        // Conecta o HTML com o servidor Node.js
-        const socket = io();
-
-        // Fica esperando o servidor avisar que alguém acertou
-        socket.on('temosVencedor', (dados) => {
-            someoneWon(dados.vencedor);
-        });
-
         // Truque para gravar vídeos: Aperta Espaço para revelar!
         document.addEventListener('keydown', (event) => {
             if (event.code === 'Space') {
                 someoneWon('Você?'); // O nome que vai aparecer na tela
             }
         });
-
         
+        // (Isso tenta conectar ao servidor, mas não quebra se estivermos apenas gravando a tela)
+        try {
+            const socket = io();
+            socket.on('temosVencedor', (dados) => {
+                someoneWon(dados.vencedor);
+            });
+        } catch (e) {
+            console.log("Modo offline para gravação de vídeos curtos.");
+        }
     </script>
 </body>
 </html>
