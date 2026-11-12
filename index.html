@@ -29,7 +29,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('famoso.jpg');
             background-size: cover;
             background-position: center;
         }
@@ -76,7 +75,7 @@
 <body>
 
     <div class="game-container">
-        <div class="celebrity-photo"></div>
+        <div class="celebrity-photo" id="foto-fundo"></div>
         <div class="grid-overlay" id="grid"></div>
         <div class="winner-banner" id="winner">Vencedor: <span id="winner-name"></span>!</div>
     </div>
@@ -85,6 +84,20 @@
         const grid = document.getElementById('grid');
         const totalSquares = 100; // 10x10
         let squaresArray = [];
+
+        // 1. Lista com o nome exato das fotos que você colocou na pasta (com a extensão .jpg ou .png)
+        const listaDeFamosos = [
+            'neymar.jpg', 
+            'messi.jpg', 
+            'anitta.jpg', 
+            'cr7.jpg'
+        ];
+
+        // 2. O código escolhe uma foto aleatória dessa lista
+        const fotoSorteada = listaDeFamosos[Math.floor(Math.random() * listaDeFamosos.length)];
+
+        // 3. Aplica a foto escolhida no fundo do jogo
+        document.getElementById('foto-fundo').style.backgroundImage = `url('${fotoSorteada}')`;
 
         // 1. Criar os quadrados
         for (let i = 0; i < totalSquares; i++) {
