@@ -199,15 +199,23 @@
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-        // ATUALIZAÇÃO PARA CELULAR: Dá um toque na tela verde para travar o relógio!
+        // ATUALIZAÇÃO PARA CELULAR: Primeiro toque revela, segundo toque reinicia!
         document.addEventListener('click', () => {
-            someoneWon('Você?');
+            if (!jogoAcabou) {
+                someoneWon('Você?'); // 1º Toque: Revela e trava o tempo
+            } else {
+                location.reload();   // 2º Toque: Sorteia outro famoso e zera tudo
+            }
         });
 
-        // Truque para gravar vídeos no PC (apertando a Barra de Espaço)
+        // ATUALIZAÇÃO PARA PC: Primeiro Espaço revela, segundo Espaço reinicia!
         document.addEventListener('keydown', (event) => {
             if (event.code === 'Space') {
-                someoneWon('Você?');
+                if (!jogoAcabou) {
+                    someoneWon('Você?'); // 1º Espaço: Revela e trava o tempo
+                } else {
+                    location.reload();   // 2º Espaço: Sorteia outro famoso e zera tudo
+                }
             }
         });
         
