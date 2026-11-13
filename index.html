@@ -66,8 +66,8 @@
             width: 100%;
             height: 100%;
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            grid-template-rows: repeat(10, 1fr);
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
         }
 
         .square {
@@ -125,7 +125,7 @@
     
     <script>
         const grid = document.getElementById('grid');
-        const totalSquares = 100; // 10x10
+        const totalSquares = 64; // 10x10
         let squaresArray = [];
 
         // 1. Lista com a foto e o nome exato do famoso
@@ -133,7 +133,7 @@
             { arquivo: 'neymar.jpg', nome: 'Neymar Jr.' },
             { arquivo: 'messi.jpg', nome: 'Lionel Messi' },
             { arquivo: 'anitta.jpg', nome: 'Anitta' },
-            { arquivo: 'cr7.jpg', nome: 'Cristiano Ronaldo' }
+            { arquivo: 'cr7.jpg', nome: 'Cristiano Ronaldo' },
             { arquivo: 'Haaland.jpg', nome: 'Haaland' }
         ];
 
