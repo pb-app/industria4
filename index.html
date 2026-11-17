@@ -2,39 +2,36 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <!-- A TAG MÁGICA: Diz para o celular não diminuir a tela e ajustar ao tamanho do aparelho -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Quem é o Famoso?</title>
     <style>
         body {
-            background-color: #00ff00; /* Fundo verde */
+            background-color: #00ff00; /* Fundo verde para Chroma Key */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            overflow: hidden; /* Evita que a tela crie barra de rolagem */
+            overflow: hidden;
         }
 
         .game-container {
             position: relative;
-            /* Alterado para responsivo: Ocupa 90% da largura do celular */
             width: 90vw; 
-            max-width: 500px; /* Mantém o limite caso você abra no PC */
-            aspect-ratio: 1 / 1; /* Garante que a foto continue um quadrado perfeito */
+            max-width: 500px;
+            aspect-ratio: 1 / 1;
             border: 5px solid #fff;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             margin-top: 50px; 
         }
 
-        /* O Cronômetro no topo da tela */
         .timer-display {
             position: absolute;
             top: -65px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 32px; /* Tamanho da fonte ajustado para celular */
+            font-size: 32px;
             font-weight: 900;
             color: #ffffff;
             background-color: #ff004f; 
@@ -44,10 +41,9 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             z-index: 20;
             transition: background-color 0.3s;
-            white-space: nowrap; /* Impede que o tempo quebre em duas linhas */
+            white-space: nowrap;
         }
 
-        /* A foto do famoso no fundo */
         .celebrity-photo {
             position: absolute;
             top: 0;
@@ -58,7 +54,6 @@
             background-position: center;
         }
 
-        /* A grade de quadrados que vai cobrir a foto */
         .grid-overlay {
             position: absolute;
             top: 0;
@@ -66,8 +61,8 @@
             width: 100%;
             height: 100%;
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
         }
 
         .square {
@@ -80,7 +75,6 @@
             opacity: 0;
         }
 
-        /* Mensagem de Vencedor */
         .winner-banner {
             position: absolute;
             bottom: -60px;
@@ -96,7 +90,6 @@
             box-sizing: border-box;
         }
 
-        /* Estilo do nome do famoso que vai aparecer */
         .celebrity-name {
             position: absolute;
             top: 15px;
@@ -114,9 +107,7 @@
 <body>
 
     <div class="game-container">
-        <!-- Aqui está a caixinha do tempo -->
         <div class="timer-display" id="tempo">0s</div>
-
         <div class="celebrity-photo" id="foto-fundo"></div>
         <div class="grid-overlay" id="grid"></div>
         <div class="winner-banner" id="winner">Vencedor: <span id="winner-name"></span>!</div>
@@ -125,10 +116,10 @@
     
     <script>
         const grid = document.getElementById('grid');
-        const totalSquares = 64; // 10x10
+        const totalSquares = 100; // 10x10
         let squaresArray = [];
 
-        // 1. Lista com a foto e o nome exato do famoso
+        // 1. Lista sequencial com os 14 famosos
         const listaDeFamosos = [
             { arquivo: 'Ana Castela.jpg', nome: 'Ana Castela' },
             { arquivo: 'anitta.jpg', nome: 'Anitta' },
@@ -146,49 +137,49 @@
             { arquivo: 'Zé felipe.jpg', nome: 'Zé Felipe' }
         ];
 
-        // 2. O código escolhe um famoso aleatório dessa lista
-        const famosoSorteado = listaDeFamosos[Math.floor(Math.random() * listaDeFamosos.length)];
+        // 2. Recupera a posição atual na fila (começa no 0 = Ana Castela)
+        let indiceAtual = parseInt(localStorage.getItem('indiceFamoso')) || 0;
+        if (indiceAtual >= listaDeFamosos.length || indiceAtual < 0) {
+            indiceAtual = 0;
+        }
 
-        // 3. Aplica a foto no fundo e já deixa o nome dele preparado
-        document.getElementById('foto-fundo').style.backgroundImage = `url('${famosoSorteado.arquivo}')`;
-        document.getElementById('nome-famoso').innerText = famosoSorteado.nome;
+        const famosoAtual = listaDeFamosos[indiceAtual];
 
-        // 4. Criar os quadrados
+        // 3. Aplica a foto e prepara o nome do famoso da vez
+        document.getElementById('foto-fundo').style.backgroundImage = `url('${famosoAtual.arquivo}')`;
+        document.getElementById('nome-famoso').innerText = famosoAtual.nome;
+
+        // 4. Cria e embaralha os quadrados
         for (let i = 0; i < totalSquares; i++) {
             const square = document.createElement('div');
             square.classList.add('square');
             grid.appendChild(square);
             squaresArray.push(square);
         }
-
-        // 5. Embaralhar a ordem dos quadrados
         squaresArray.sort(() => Math.random() - 0.5);
 
-        // 6. Variáveis do jogo e do tempo
+        // 5. Cronômetro e remoção dos quadrados
         let currentIndex = 0;
         let tempoDecorrido = 0; 
-        let jogoAcabou = false; // Controle para evitar travar duas vezes
+        let jogoAcabou = false;
         
-        // 7. Função que remove quadrados e conta o tempo a cada 1 segundo
         const revealInterval = setInterval(() => {
             if (currentIndex < squaresArray.length && !jogoAcabou) {
                 squaresArray[currentIndex].classList.add('hidden');
                 currentIndex++;
                 
-                // Aumenta o tempo e atualiza na tela
                 tempoDecorrido++;
                 document.getElementById('tempo').innerText = tempoDecorrido + "s";
             } else if (!jogoAcabou) {
-                // Acabou o tempo e as peças sumiram
                 clearInterval(revealInterval); 
                 document.getElementById('nome-famoso').style.display = 'block';
                 jogoAcabou = true;
             }
-        }, 500); 
+        }, 500); // Velocidade: 500ms por quadrado (altere se quiser mais rápido/lento)
 
-        // 8. Função de vitória
+        // 6. Revela a resposta e trava o tempo
         function someoneWon(playerName) {
-            if (jogoAcabou) return; // Se já acabou, não faz nada
+            if (jogoAcabou) return;
             jogoAcabou = true;
 
             clearInterval(revealInterval); 
@@ -198,37 +189,49 @@
             document.getElementById('winner').style.display = 'block';
             document.getElementById('nome-famoso').style.display = 'block'; 
 
-            // Muda a cor do cronômetro para verde florescente
             document.getElementById('tempo').style.backgroundColor = "#00ffcc";
             document.getElementById('tempo').style.color = "#000000";
         }
+
+        // 7. Salva o próximo índice da fila e recarrega para o próximo famoso
+        function avancarProximoFamoso() {
+            const proximoIndice = (indiceAtual + 1) % listaDeFamosos.length;
+            localStorage.setItem('indiceFamoso', proximoIndice);
+            location.reload();
+        }
     </script> 
 
-    <!-- Link do Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-        // ATUALIZAÇÃO PARA CELULAR: Primeiro toque revela, segundo toque reinicia!
+        // Celular: 1º toque revela, 2º toque vai para o próximo da lista
         document.addEventListener('click', () => {
             if (!jogoAcabou) {
-                someoneWon('Você?'); // 1º Toque: Revela e trava o tempo
+                someoneWon('Você?');
             } else {
-                location.reload();   // 2º Toque: Sorteia outro famoso e zera tudo
+                avancarProximoFamoso();
             }
         });
 
-        // ATUALIZAÇÃO PARA PC: Primeiro Espaço revela, segundo Espaço reinicia!
+        // PC: 1º Espaço revela, 2º Espaço vai para o próximo da lista
         document.addEventListener('keydown', (event) => {
             if (event.code === 'Space') {
+                event.preventDefault();
                 if (!jogoAcabou) {
-                    someoneWon('Você?'); // 1º Espaço: Revela e trava o tempo
+                    someoneWon('Você?');
                 } else {
-                    location.reload();   // 2º Espaço: Sorteia outro famoso e zera tudo
+                    avancarProximoFamoso();
                 }
+            }
+
+            // Atalho opcional (tecla R): volta para o 1º famoso da lista
+            if (event.code === 'KeyR') {
+                localStorage.setItem('indiceFamoso', 0);
+                location.reload();
             }
         });
         
-        // Conexão com o servidor do Bot (Não interfere na gravação do celular)
+        // Conexão com o bot da live (para quando for usar ao vivo)
         try {
             const socket = io();
             socket.on('temosVencedor', (dados) => {
