@@ -110,41 +110,41 @@
             background-position: center;
         }
 
-        /* Grade 5x5 (blocos com o dobro do tamanho) */
+        /* Grade 7x7 (meio-termo ideal) */
         .grid-overlay {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(5, 1fr);
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(7, 1fr);
             background-color: rgba(10, 6, 26, 0.25);
         }
 
         /* Blocos estilizados com relevo 3D leve e borda brilhante */
         .square {
             background: linear-gradient(145deg, #2a1b54 0%, #160d30 100%);
-            border: 1px solid rgba(0, 240, 255, 0.3);
+            border: 1px solid rgba(0, 240, 255, 0.28);
             box-shadow: 
-                inset 0 2px 2px rgba(255, 255, 255, 0.22),
-                inset 0 -3px 6px rgba(0, 0, 0, 0.65);
+                inset 0 1px 2px rgba(255, 255, 255, 0.22),
+                inset 0 -2px 5px rgba(0, 0, 0, 0.65);
             display: flex;
             justify-content: center;
             align-items: center;
-            color: rgba(0, 240, 255, 0.55);
-            font-size: clamp(22px, 6vw, 32px);
+            color: rgba(0, 240, 255, 0.52);
+            font-size: clamp(16px, 4.2vw, 23px);
             font-weight: 900;
             user-select: none;
             transition: opacity 0.35s ease, transform 0.35s ease;
         }
 
         .square:nth-child(3n) {
-            color: rgba(255, 0, 153, 0.52);
+            color: rgba(255, 0, 153, 0.5);
         }
 
         .square:nth-child(5n) {
-            color: rgba(255, 208, 0, 0.5);
+            color: rgba(255, 208, 0, 0.48);
         }
 
         .hidden {
@@ -223,7 +223,7 @@
         }
 
         const grid = document.getElementById('grid');
-        const totalSquares = 25; // 5x5
+        const totalSquares = 49; // 7x7
         let squaresArray = [];
 
         // 1. Lista sequencial com os 14 famosos
@@ -256,7 +256,7 @@
         document.getElementById('foto-fundo').style.backgroundImage = `url('${famosoAtual.arquivo}')`;
         document.getElementById('nome-famoso').innerText = famosoAtual.nome;
 
-        // 4. Cria e embaralha os 25 quadrados com "?"
+        // 4. Cria e embaralha os 49 quadrados com "?"
         for (let i = 0; i < totalSquares; i++) {
             const square = document.createElement('div');
             square.classList.add('square');
@@ -283,7 +283,7 @@
                 document.getElementById('nome-famoso').style.display = 'block';
                 jogoAcabou = true;
             }
-        }, 1000); // 500ms por bloco (mude para 1000 se quiser 1 segundo real por bloco)
+        }, 800);
 
         // 6. Revela a resposta e trava o tempo
         function someoneWon(playerName) {
