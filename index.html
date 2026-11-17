@@ -5,49 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Quem é o Famoso?</title>
     <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            background-color: #00ff00; /* Fundo verde para Chroma Key */
+            background: radial-gradient(circle at 50% 45%, #231247 0%, #0f0a24 55%, #060412 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Partículas sutis no fundo */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
             overflow: hidden;
         }
 
+        .particle {
+            position: absolute;
+            bottom: -20px;
+            border-radius: 50%;
+            opacity: 0.45;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.5;
+            }
+            85% {
+                opacity: 0.35;
+            }
+            100% {
+                transform: translateY(-110vh) scale(0.6);
+                opacity: 0;
+            }
+        }
+
+        /* Moldura principal com brilho neon */
         .game-container {
             position: relative;
             width: 90vw; 
             max-width: 500px;
             aspect-ratio: 1 / 1;
-            border: 5px solid #fff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin-top: 50px; 
+            border-radius: 18px;
+            border: 3px solid #00f0ff;
+            box-shadow: 
+                0 0 25px rgba(0, 240, 255, 0.45),
+                0 0 60px rgba(255, 0, 128, 0.25),
+                0 15px 35px rgba(0, 0, 0, 0.8);
+            margin-top: 35px;
+            z-index: 5;
+            background-color: #120b29;
+        }
+
+        /* Área interna que recorta a foto e os blocos nos cantos arredondados */
+        .board-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            overflow: hidden;
         }
 
         .timer-display {
             position: absolute;
-            top: -65px;
+            top: -62px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 900;
             color: #ffffff;
-            background-color: #ff004f; 
-            padding: 5px 25px;
-            border-radius: 15px;
-            border: 4px solid #fff;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #ff0055 0%, #ff0099 100%);
+            padding: 6px 28px;
+            border-radius: 50px;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.65), 0 6px 15px rgba(0, 0, 0, 0.6);
             z-index: 20;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
             white-space: nowrap;
+            letter-spacing: 1px;
         }
 
         .celebrity-photo {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             background-size: cover;
@@ -56,49 +112,79 @@
 
         .grid-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             display: grid;
             grid-template-columns: repeat(10, 1fr);
             grid-template-rows: repeat(10, 1fr);
+            background-color: rgba(10, 6, 26, 0.25);
         }
 
+        /* Blocos estilizados com relevo 3D leve e borda brilhante */
         .square {
-            background-color: #1a1a1a;
-            border: 1px solid #333;
-            transition: opacity 0.3s ease;
+            background: linear-gradient(145deg, #2a1b54 0%, #160d30 100%);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            box-shadow: 
+                inset 0 1px 1px rgba(255, 255, 255, 0.22),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.65);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(0, 240, 255, 0.5);
+            font-size: clamp(11px, 2.8vw, 16px);
+            font-weight: 900;
+            user-select: none;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+
+        /* Alterna levemente a cor do "?" para dar textura visual */
+        .square:nth-child(3n) {
+            color: rgba(255, 0, 153, 0.48);
+        }
+
+        .square:nth-child(5n) {
+            color: rgba(255, 208, 0, 0.45);
         }
 
         .hidden {
             opacity: 0;
+            transform: scale(0.65);
+            pointer-events: none;
         }
 
         .winner-banner {
             position: absolute;
-            bottom: -60px;
+            bottom: -64px;
+            left: 0;
             width: 100%;
             text-align: center;
-            background: #ffcc00;
-            padding: 10px;
+            background: linear-gradient(135deg, #ffd000 0%, #ff9900 100%);
+            color: #140c29;
+            padding: 11px 16px;
             font-size: 20px;
-            font-weight: bold;
+            font-weight: 900;
             display: none;
-            border-radius: 10px;
+            border-radius: 14px;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 20px rgba(255, 208, 0, 0.5), 0 8px 20px rgba(0, 0, 0, 0.6);
             z-index: 20;
-            box-sizing: border-box;
         }
 
         .celebrity-name {
             position: absolute;
-            top: 15px;
+            top: 0;
+            left: 0;
             width: 100%;
+            padding: 14px 10px 26px;
             text-align: center;
             color: #ffffff;
-            font-size: 30px;
+            background: linear-gradient(180deg, rgba(10, 6, 28, 0.88) 0%, rgba(10, 6, 28, 0) 100%);
+            font-size: 28px;
             font-weight: 900;
-            text-shadow: 3px 3px 10px #000000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(0, 240, 255, 0.7), 0 3px 8px #000000;
             display: none;
             z-index: 10;
         }
@@ -106,15 +192,36 @@
 </head>
 <body>
 
+    <div class="particles" id="particles"></div>
+
     <div class="game-container">
         <div class="timer-display" id="tempo">0s</div>
-        <div class="celebrity-photo" id="foto-fundo"></div>
-        <div class="grid-overlay" id="grid"></div>
+        <div class="board-inner">
+            <div class="celebrity-photo" id="foto-fundo"></div>
+            <div class="grid-overlay" id="grid"></div>
+            <div class="celebrity-name" id="nome-famoso"></div>
+        </div>
         <div class="winner-banner" id="winner">Vencedor: <span id="winner-name"></span>!</div>
-        <div class="celebrity-name" id="nome-famoso"></div>
     </div>
     
     <script>
+        // Gera partículas neon sutis no fundo
+        const particlesContainer = document.getElementById('particles');
+        const particleColors = ['#00f0ff', '#ff007f', '#ffd000', '#9d4edd'];
+        for (let i = 0; i < 24; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            const size = Math.random() * 5 + 3;
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+            p.style.left = `${Math.random() * 100}%`;
+            p.style.backgroundColor = particleColors[i % particleColors.length];
+            p.style.boxShadow = `0 0 8px ${particleColors[i % particleColors.length]}`;
+            p.style.animationDuration = `${Math.random() * 8 + 7}s`;
+            p.style.animationDelay = `${Math.random() * 6}s`;
+            particlesContainer.appendChild(p);
+        }
+
         const grid = document.getElementById('grid');
         const totalSquares = 100; // 10x10
         let squaresArray = [];
@@ -149,10 +256,11 @@
         document.getElementById('foto-fundo').style.backgroundImage = `url('${famosoAtual.arquivo}')`;
         document.getElementById('nome-famoso').innerText = famosoAtual.nome;
 
-        // 4. Cria e embaralha os quadrados
+        // 4. Cria e embaralha os quadrados com "?"
         for (let i = 0; i < totalSquares; i++) {
             const square = document.createElement('div');
             square.classList.add('square');
+            square.innerText = '?';
             grid.appendChild(square);
             squaresArray.push(square);
         }
@@ -175,7 +283,7 @@
                 document.getElementById('nome-famoso').style.display = 'block';
                 jogoAcabou = true;
             }
-        }, 500); // Velocidade: 500ms por quadrado (altere se quiser mais rápido/lento)
+        }, 500);
 
         // 6. Revela a resposta e trava o tempo
         function someoneWon(playerName) {
@@ -189,8 +297,10 @@
             document.getElementById('winner').style.display = 'block';
             document.getElementById('nome-famoso').style.display = 'block'; 
 
-            document.getElementById('tempo').style.backgroundColor = "#00ffcc";
-            document.getElementById('tempo').style.color = "#000000";
+            const timerEl = document.getElementById('tempo');
+            timerEl.style.background = "linear-gradient(135deg, #00f5d4 0%, #00bbf9 100%)";
+            timerEl.style.color = "#060412";
+            timerEl.style.boxShadow = "0 0 25px rgba(0, 245, 212, 0.8)";
         }
 
         // 7. Salva o próximo índice da fila e recarrega para o próximo famoso
@@ -224,14 +334,14 @@
                 }
             }
 
-            // Atalho opcional (tecla R): volta para o 1º famoso da lista
+            // Atalho (tecla R): volta para o 1º famoso da lista
             if (event.code === 'KeyR') {
                 localStorage.setItem('indiceFamoso', 0);
                 location.reload();
             }
         });
         
-        // Conexão com o bot da live (para quando for usar ao vivo)
+        // Conexão com o bot da live
         try {
             const socket = io();
             socket.on('temosVencedor', (dados) => {
